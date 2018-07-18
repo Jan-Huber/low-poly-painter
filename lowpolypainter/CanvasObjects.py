@@ -44,6 +44,7 @@ class CanvasPoint:
         shiftMask = 0x0001
         self.gui.mouseEventHandled = True
         if (event.state & shiftMask) and (self.gui.selectedPoint is not None):
+            self.gui.parent.undoManager.do(self.gui.parent)
             self.parent.addLine(self, self.gui.selectedPoint)
             return
         self.gui.selectPoint(self)

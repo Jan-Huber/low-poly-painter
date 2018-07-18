@@ -15,6 +15,7 @@ from lowpolypainter.triangulation import bowyerWatson
 from lowpolypainter.CanvasObjects import *
 from zoomTransformer import ZoomTransformer
 from CanvasObjectsMesh import CanvasObjectsMesh
+from lowpolypainter.undoManager import UndoManager
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
@@ -55,9 +56,13 @@ class Window(object):
         # HowTo text
         self.textFrame = TextFrame(self)
         self.textFrame.grid()
+        
+        # UndoManager
+        self.undoManager = UndoManager()
 
     # Clear mesh and canvas
     def clear(self):
+        self.undoManager.do(self)
         self.canvasFrame.clear()
 
     # exports current mesh as svg image
@@ -75,6 +80,23 @@ class Window(object):
     # loads mesh data from inputimage related .py file by using cPickle
     def loadMeshData(self):
         path = 'lowpolypainter/resources/stored_mesh_data/' + self.inputimage + '.py'
+        if os.path.isfile(path):
+            file = open(path, 'r')
+            mesh = pickle.load(file)
+            file.close()
+            self.canvasFrame.canvasObjectsMesh.fromMesh(mesh)
+            
+    # saves mesh data in a .py file by using cPickle with a given name
+    def saveMeshDataAs(self, name):
+        path = name + '.py'
+        file = open(path, 'w')
+        mesh = self.canvasFrame.canvasObjectsMesh.toMesh()
+        pickle.dump(mesh, file)
+        file.close()
+
+    # loads mesh data from inputimage related .py file by using cPickle with a given name
+    def loadMeshDataAs(self, name):
+        path = name + '.py'
         if os.path.isfile(path):
             file = open(path, 'r')
             mesh = pickle.load(file)
@@ -153,6 +175,14 @@ class Window(object):
         print("Time to add faces to CanvasMesh:", time.time() - t)
         print("Num faces: ", len(canvasMesh.faces))
 
+    # undoes the last change
+    def undo(self):
+        self.undoManager.undo(self)
+
+    # redoes the last undo
+    def redo(self):
+        self.undoManager.redo(self)
+
 
 class CanvasFrame(Frame):
     """
@@ -215,6 +245,7 @@ class CanvasFrame(Frame):
 
         # If an element of the canvas is clicked that has its own event handler, then it will set this property
         if not self.mouseEventHandled:
+            self.parent.undoManager.do(self.parent)
             vertex = self.parent.zoom.FromViewport([event.x, event.y])
             prevSelectedPoint = self.selectedPoint
             self.addPoint(int(vertex[0]), int(vertex[1]))
@@ -246,6 +277,7 @@ class CanvasFrame(Frame):
         self.currentFaceState = state
 
     def deleteSelected(self, event):
+        self.parent.undoManager.do(self.parent)
         if self.selectedPoint is not None:
             self.selectedPoint.delete()
             self.selectedPoint = None
@@ -318,6 +350,14 @@ class ButtonFrame(Frame):
 
         # Save button
         self.saveButton = Button(self, text="Save", command=parent.saveMeshData)
+        self.saveButton.grid()
+        
+        # Undo button
+        self.saveButton = Button(self, text="Undo", command=parent.undo)
+        self.saveButton.grid()
+        
+        # Redo button
+        self.saveButton = Button(self, text="Redo", command=parent.redo)
         self.saveButton.grid()
 
 class TextFrame(Frame):
