@@ -46,36 +46,36 @@ class Colorwheel(Frame):
         self.activeColorCanvasHeight = 50
         self.canvas = Canvas(self.topFrame, width=self.activeColorCanvasWidth, height=self.activeColorCanvasHeight)
         self.redraw()
-        self.canvas.pack()
+        self.canvas.grid(column=0)
 
 
         self.firstColorFrame = Frame(self.bottomFrame)
-        self.firstColorFrame.pack(side=LEFT)
+        self.firstColorFrame.grid(row=0, column=0)
         self.firstColorButtonSafe = Button(self.firstColorFrame, text="Safe", fg="white", bg=self.firstColor, width=8, height=2, command=self.firstColorSafe)
-        self.firstColorButtonSafe.pack()
+        self.firstColorButtonSafe.grid()
         self.firstColorButtonUse = Button(self.firstColorFrame, text="Use", fg="white", bg=self.firstColor, width=8, height=2, command=self.firstColorUse)
-        self.firstColorButtonUse.pack()
+        self.firstColorButtonUse.grid()
 
 
         self.secondColorFrame = Frame(self.bottomFrame)
-        self.secondColorFrame.pack(side=LEFT)
+        self.secondColorFrame.grid(row=0, column=1)
         self.secondColorButtonSafe = Button(self.secondColorFrame, text="Safe", fg="white", bg=self.secondColor, width=8, height=2, command=self.secondColorSafe)
-        self.secondColorButtonSafe.pack()
+        self.secondColorButtonSafe.grid()
         self.secondColorButtonUse = Button(self.secondColorFrame, text="Use", fg="white", bg=self.secondColor, width=8, height=2, command=self.secondColorUse)
-        self.secondColorButtonUse.pack()
+        self.secondColorButtonUse.grid()
 
 
         self.thirdColorFrame = Frame(self.bottomFrame)
-        self.thirdColorFrame.pack(side=LEFT)
+        self.thirdColorFrame.grid(row=0, column=2)
         self.thirdColorButtonSafe = Button(self.thirdColorFrame, text="Safe", fg="white", bg=self.thirdColor, width=8, height=2, command=self.thirdColorSafe)
-        self.thirdColorButtonSafe.pack()
+        self.thirdColorButtonSafe.grid()
         self.thirdColorButtonUse = Button(self.thirdColorFrame, text="Use", fg="white", bg=self.thirdColor, width=8, height=2, command=self.thirdColorUse)
-        self.thirdColorButtonUse.pack()
+        self.thirdColorButtonUse.grid()
 
         self.menueFrame = Frame(self.bottomFrame)
-        self.menueFrame.pack(side=LEFT)
+        self.menueFrame.grid(row=0, column=3)
         self.REFINE = Button(self.menueFrame, text="Edit", command=self.refine)
-        self.REFINE.pack()
+        self.REFINE.grid()
 
 
     def __init__(self, window):
@@ -87,11 +87,11 @@ class Colorwheel(Frame):
         self.thirdColor = "black"
 
         self.mainFrame = Frame(self.window.detailFrame)
-        self.mainFrame.pack()
+        self.mainFrame.grid(row=0)
 
         self.topFrame = Frame(self.mainFrame)
-        self.topFrame.pack()
+        self.topFrame.grid(row=0)
         self.bottomFrame = Frame(self.mainFrame)
-        self.bottomFrame.pack(side=BOTTOM)
+        self.bottomFrame.grid(row=1)
 
         self.createWidgets()
