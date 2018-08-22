@@ -11,9 +11,6 @@ COLOR_BORDER = "#FFFFFF"
 COLOR_DEFAULT = "#3B99FC"
 COLOR_SELECTED = "#ff0000"
 
-# MASK
-MASK_SHIFT = 0x0001
-
 class Vertex:
     """
     Vertex
@@ -46,18 +43,24 @@ class Vertex:
 
     """ EVENTS """
     def clickHandle(self, event):
-        '''
-        Shift click on vertex: Creates edge to vertex
-        Default click on vertex: Sets vertex as selected
-        '''
-        self.parent.mouseEvent = True
         x, y = int(self.coords[0]), int(self.coords[1])
         self.parent.mesh.bvertices[x][y] = 0
-        if (event.state & MASK_SHIFT) and (self.parent.selected is not None):
-            self.parent.mesh.addEdge(self, self.parent.selected)
-            return
-        self.select()
-        self.parent.select(self)
+        if self.parent.ControlMode=="NewPointAndLine":
+            self.parent.mouseEvent = True
+            if self.parent.selected is not None:
+                if self.getEdge(self.parent.selected) is None:
+                    self.parent.mesh.addEdge(self, self.parent.selected)
+                    return
+            self.select()
+            self.parent.select(self)
+
+        if self.parent.ControlMode == "NewPointOnly":
+            self.parent.mouseEvent = True
+            self.select()
+            self.parent.select(self)
+
+
+
 
     def moveHandle(self, event):
         zoomedCoords = self.parent.parent.zoom.FromViewport([event.x, event.y])

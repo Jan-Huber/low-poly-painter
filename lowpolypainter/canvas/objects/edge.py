@@ -52,20 +52,21 @@ class Edge:
         Shift click on Edge: Place vertex on edge
         Default click on vertex: Sets edge as selected
         '''
-        self.parent.mouseEvent = True
+        if (self.parent.ControlMode=="NewPointAndLine" or self.parent.ControlMode=="NewPointOnly"):
+            self.parent.mouseEvent = True
 
-        if (event.state & MASK_SHIFT):
-            vert = self.parent.mesh.addVertex([event.x, event.y])
+            if (event.state & MASK_SHIFT):
+                vert = self.parent.mesh.addVertex([event.x, event.y])
 
-            # TODO: IF SELECTED IS VERTEX
-            if isinstance(self.parent.selected, Vertex):
-                self.parent.mesh.addEdge(vert, self.parent.selected)
-            self.parent.mesh.addEdge(vert, self.verts[0])
-            self.parent.mesh.addEdge(vert, self.verts[1])
-            self.delete()
-        else:
-            self.select()
-            self.parent.select(self)
+                # TODO: IF SELECTED IS VERTEX
+                if isinstance(self.parent.selected, Vertex):
+                    self.parent.mesh.addEdge(vert, self.parent.selected)
+                self.parent.mesh.addEdge(vert, self.verts[0])
+                self.parent.mesh.addEdge(vert, self.verts[1])
+                self.delete()
+            else:
+                self.select()
+                self.parent.select(self)
 
     """ GENERAL """
     def getColor(self):

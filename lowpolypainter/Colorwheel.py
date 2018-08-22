@@ -33,45 +33,14 @@ class Colorwheel(Frame):
 
 
     # Menuebuttons
-    def confirm(self):
-        # print self.activecol
-        face = self.mesh.getFaceByID(self.fn)
-        face.color=self.activecol
-        if self.locking.get():
-            face.colorLock = True
-        else:
-            face.colorLock = False
-        self.window.canvasFrame.canvas.itemconfig(self.fn, fill=self.activecol)
-        self.window.colorWheelSafePoint1 = self.firstColor
-        self.window.colorWheelSafePoint2 = self.secondColor
-        self.window.colorWheelSafePoint3 = self.thirdColor
-        self.cw.quit()
-
     def refine(self):
         self.activecol = askcolor(self.activecol)[1]
         self.redraw()
 
+    # Redrawing Color at the top
     def redraw(self):
         self.canvas.create_rectangle(0, 0, self.activeColorCanvasWidth+1, self.activeColorCanvasHeight+1, fill=self.activecol)
 
-    def unlockAndRestore(self):
-        face = self.mesh.getFaceByID(self.fn)
-        face.colorLock = False
-        self.LOCKBUTTON.deselect()
-        self.toggleLock()
-        self.activecol=face.getColorFromImage()
-        face.color = self.activecol
-        self.window.canvasFrame.canvas.itemconfig(self.fn, fill=self.activecol)
-        self.redraw()
-
-    # Workaround for the checkbox
-    def toggleLock(self):
-        if self.locking.get():
-            self.locking.set(0)
-        else:
-            self.locking.set(1)
-
-    # Completly overloaded. Will rework this before holidays
     def createWidgets(self):
         self.activeColorCanvasWidth = 50
         self.activeColorCanvasHeight = 50
@@ -105,34 +74,19 @@ class Colorwheel(Frame):
 
         self.menueFrame = Frame(self.bottomFrame)
         self.menueFrame.pack(side=LEFT)
-        self.CONFIRM = Button(self.menueFrame, text="Confirm", command=self.confirm)
-        self.CONFIRM.pack()
-        self.LOCKBUTTON = Checkbutton(self.menueFrame, text="Lock", variable=self.locking, onvalue=1, offvalue=0, command=self.toggleLock)
-        self.LOCKBUTTON.pack()
-        self.LOCKBUTTON.select()
-        self.toggleLock()
-
-        self.UNLOCK = Button(self.menueFrame, text="Unlock and Restore", command=self.unlockAndRestore)
-        self.UNLOCK.pack()
         self.REFINE = Button(self.menueFrame, text="Edit", command=self.refine)
         self.REFINE.pack()
 
 
-        self.QUIT = Button(self.menueFrame, text="Abort", command=self.cw.quit)
-        self.QUIT.pack()
-
-    def __init__(self, window, cw):
+    def __init__(self, window):
         self.window = window
-        self.fn = self.window.canvasFrame.selectedFace[1]
         self.mesh = window.canvasFrame.mesh
-        self.activecol = self.mesh.getFaceByID(self.fn).color
-        self.firstColor = self.window.colorWheelSafePoint1
-        self.secondColor = self.window.colorWheelSafePoint2
-        self.thirdColor = self.window.colorWheelSafePoint3
-        self.cw=cw
-        self.locking = IntVar()
+        self.activecol = "grey"
+        self.firstColor = "black"
+        self.secondColor = "black"
+        self.thirdColor = "black"
 
-        self.mainFrame = Frame(self.cw)
+        self.mainFrame = Frame(self.window.detailFrame)
         self.mainFrame.pack()
 
         self.topFrame = Frame(self.mainFrame)

@@ -9,9 +9,6 @@ from mesh import Mesh
 from lowpolypainter.canny import Canny
 from lowpolypainter.color import Color
 
-# Masks
-CTRL_MASK = 0x0004
-
 class CanvasFrame(Frame):
     """
     Canvas Frame Class
@@ -58,14 +55,25 @@ class CanvasFrame(Frame):
 
          # Mouse Event
         self.mouseEvent = False
-
         self.faceState = NORMAL
+
+        # Controls
+        self.ControlMode = "NewPointAndLine"
+
+        # Reading settings
+        with open("./lowpolypainter/resources/settings.config", 'r') as settings:
+            l = settings.readlines()
 
         # Events
         self.canvas.bind("<Button>", self.click)
         self.canvas.bind_all("<space>", func=self.toggleFaces)
+        self.canvas.bind_all(l[0][0], self.changeCModetoNPAL)
+        self.canvas.bind_all(l[1][0], self.changeCModetoNPO)
+        self.canvas.bind_all(l[2][0], self.changeCModetoUC)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
+        self.canvas.bind_all(l[3][0], self.changeCModetoGC)
+        self.canvas.bind_all(l[4][0], self.changeCModetoCU)
 
     """ EVENT """
     def click(self, event):
@@ -75,6 +83,8 @@ class CanvasFrame(Frame):
         Description:
         Adds point to canvas, will draw line to last point while ctrl isn't pressed
         """
+
+        """
         eventPoint = [event.x, event.y]
         if self.inBounds(eventPoint) and not self.mouseEvent:
             previousSelected = self.selected
@@ -83,6 +93,26 @@ class CanvasFrame(Frame):
             if (previousSelected is not None) and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
+        
+        """
+        if self.mouseEvent:
+            return
+        elif (self.ControlMode=="NewPointAndLine"):
+            eventPoint = [event.x, event.y]
+            if self.inBounds(eventPoint):
+                previousSelected = self.selected
+                zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
+                self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
+                if (previousSelected is not None):
+                    self.mesh.addEdge(previousSelected, self.selected)
+        elif (self.ControlMode=="NewPointOnly"):
+            eventPoint = [event.x, event.y]
+            if self.inBounds(eventPoint):
+                previousSelected = self.selected
+                zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
+                self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
+
+
 
     """ FACE """
     def toggleFaces(self, event):
@@ -114,6 +144,23 @@ class CanvasFrame(Frame):
     def clear(self):
         self.selectedFace = [False, None]
         self.mesh.clear()
+
+    # Modechanging with Keys
+    def changeCModetoNPAL(self, event):
+        self.ControlMode = "NewPointAndLine"
+
+    def changeCModetoNPO(self, event):
+        self.ControlMode = "NewPointOnly"
+
+    def changeCModetoUC(self, event):
+        self.ControlMode = "UseColor"
+
+    def changeCModetoGC(self, event):
+        self.ControlMode = "GetColor"
+
+    def changeCModetoCU(self, event):
+        self.ControlMode = "ColorUnlock"
+
 
     """ CANNY """
     def canny(self):

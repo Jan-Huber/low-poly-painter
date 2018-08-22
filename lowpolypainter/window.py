@@ -61,16 +61,9 @@ class Window(object):
         self.detailFrame = DetailFrame(self)
         self.detailFrame.grid(row=1, column=1, sticky=NSEW)
 
-        # Color Safepoints
-        self.colorWheelSafePoint1 = "black"
-        self.colorWheelSafePoint2 = "black"
-        self.colorWheelSafePoint3 = "black"
+        self.colorWheel = Colorwheel(self)
 
     def clear(self, event=None):
-        # Colorwheel Speicherplaetze
-        self.colorWheelSafePoint1 = "black"
-        self.colorWheelSafePoint2 = "black"
-        self.colorWheelSafePoint3 = "black"
         self.canvasFrame.clear()
 
     def export(self, event=None):
@@ -98,16 +91,17 @@ class Window(object):
         self.zoom.ZoomAt(2**(delta * 0.001), [x, y])
         self.canvasFrame.mesh.updatePositions()
 
-    def colorwheel(self, event=None):
-        if not self.canvasFrame.selectedFace[0]:
-            tkMessageBox.showinfo("Error", "No face selected!")
-            return
-        cw = Tk()
-        cw.title("Colorwheel")
-        app = Colorwheel(self, cw)
-        cw.mainloop()
-        cw.destroy()
-        self.canvasFrame.selectedFace[0]=False
+    # Modechanging with Buttons
+    def changeCModetoNPAL(self, event):
+        self.canvasFrame.ControlMode = "NewPointAndLine"
+    def changeCModetoNPO(self, event):
+        self.canvasFrame.ControlMode = "NewPointOnly"
+    def changeCModetoGC(self, event):
+        self.canvasFrame.ControlMode = "GetColor"
+    def changeCModetoUC(self, event):
+        self.canvasFrame.ControlMode = "UseColor"
+    def changeCModetoCU(self, event):
+        self.canvasFrame.ControlMode = "ColorUnlock"
 
 class ToolbarFrame(Frame):
     """
@@ -147,6 +141,11 @@ class ButtonFrame(Frame):
         icon_3 = PhotoImage(file="./lowpolypainter/resources/icons/Color.gif")
         icon_4 = PhotoImage(file="./lowpolypainter/resources/icons/Save.gif")
         icon_5 = PhotoImage(file="./lowpolypainter/resources/icons/Export.gif")
+        icon_6 = PhotoImage(file="./lowpolypainter/resources/icons/PandL.gif")
+        icon_7 = PhotoImage(file="./lowpolypainter/resources/icons/P.gif")
+        icon_8 = PhotoImage(file="./lowpolypainter/resources/icons/GetColor.gif")
+        icon_9 = PhotoImage(file="./lowpolypainter/resources/icons/UseColor.gif")
+        icon_10 = PhotoImage(file="./lowpolypainter/resources/icons/ColorUnlock.gif")
 
         options = {"height": 46, "width": 46, "bg":'#DADADA', "borderwidth":0}
 
@@ -168,26 +167,53 @@ class ButtonFrame(Frame):
         self.cannyButton.grid(row=0, column=2, sticky=N+E+S+W)
         self.cannyButton.bind("<Button-1>", parent.parent.triangulate)
 
-        # Colorwheel Button
-        self.colorWheelButton = Label(self, image=icon_3, **options)
-        self.colorWheelButton.image = icon_3
-        self.colorWheelButton.grid(row=0, column=3, sticky=N+E+S+W)
-        self.colorWheelButton.bind("<Button-1>", parent.parent.colorwheel)
+
+        # Modechaning Buttons
+
+        # NewPointAndLine Button
+        self.modeOneButton = Label(self, image=icon_6, **options)
+        self.modeOneButton.image = icon_6
+        self.modeOneButton.grid(row=0, column=3, sticky=N+E+S+W)
+        self.modeOneButton.bind("<Button-1>", parent.parent.changeCModetoNPAL)
+        # NewPointOnly Button
+        self.modeTwoButton = Label(self, image=icon_7, **options)
+        self.modeTwoButton.image = icon_7
+        self.modeTwoButton.grid(row=0, column=4, sticky=N + E + S + W)
+        self.modeTwoButton.bind("<Button-1>", parent.parent.changeCModetoNPO)
+        # GetColor Button
+        self.modeThreeButton = Label(self, image=icon_8, **options)
+        self.modeThreeButton.image = icon_8
+        self.modeThreeButton.grid(row=0, column=5, sticky=N + E + S + W)
+        self.modeThreeButton.bind("<Button-1>", parent.parent.changeCModetoGC)
+        # Use Color Button
+        self.modeFourButton = Label(self, image=icon_9, **options)
+        self.modeFourButton.image = icon_9
+        self.modeFourButton.grid(row=0, column=6, sticky=N + E + S + W)
+        self.modeFourButton.bind("<Button-1>", parent.parent.changeCModetoUC)
+        # Color Unlock
+        self.modeFiveButton = Label(self, image=icon_10, **options)
+        self.modeFiveButton.image = icon_10
+        self.modeFiveButton.grid(row=0, column=7, sticky=N + E + S + W)
+        self.modeFiveButton.bind("<Button-1>", parent.parent.changeCModetoCU)
+
+
+
+
 
         # Space
         self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)
-        self.space.grid(row=0, column=4, sticky=N+E+S+W)
+        self.space.grid(row=0, column=8, sticky=N+E+S+W)
 
         # Save Button
         self.saveButton = Label(self, image=icon_4, **options)
         self.saveButton.image = icon_4
-        self.saveButton.grid(row=0, column=5, sticky=N+E+S+W)
+        self.saveButton.grid(row=0, column=9, sticky=N+E+S+W)
         self.saveButton.bind("<Button-1>", parent.parent.saveMeshData)
 
         # Export Button
         self.exportButton = Label(self, image=icon_5, **options)
         self.exportButton.image = icon_5
-        self.exportButton.grid(row=0, column=6, sticky=N+E+S+W)
+        self.exportButton.grid(row=0, column=10, sticky=N+E+S+W)
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
 class DetailFrame(Frame):
